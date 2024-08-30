@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns = "http://www.springframework.org/schema/beans"
+   xmlns:context = "http://www.springframework.org/schema/context"
+   xmlns:xsi = "http://www.w3.org/2001/XMLSchema-instance"
+   xmlns:mvc = "http://www.springframework.org/schema/mvc"
+   xmlns:tx="http://www.springframework.org/schema/tx"
+   xsi:schemaLocation = "http://www.springframework.org/schema/beans    
+   http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+   http://www.springframework.org/schema/context
+   http://www.springframework.org/schema/context/spring-context-3.0.xsd
+   http://www.springframework.org/schema/mvc
+   http://www.springframework.org/schema/mvc/spring-mvc.xsd
+   http://www.springframework.org/schema/tx
+   http://www.springframework.org/schema/tx/spring-tx.xsd">
+   
+   <!-- Adding support for Component Scanning -->
+   <!-- Contoller Classes - Entity - Service - DAO  -->
+   
+  <context:component-scan base-package="com.westernunion"/>
+   
+   <!-- Adding support for Annotation Driven Codes  -->
+   
+   <mvc:annotation-driven/>
+   
+   <!-- Configuring View Resolver -->
+   <bean id="ViewResolver"
+   		  class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+   
+   			<property name="prefix">
+   				<value>/WEB-INF/ViewPages/</value>
+   			
+   			</property>
+   			<property name="suffix">
+   				<value>.jsp</value>
+   			</property>
+   </bean>
+   
+   
+   <!-- Configuring the data source  -->
+    <!--  Configuring the Data Source -->
+   <bean id="myDataSource"
+   		 class="com.mchange.v2.c3p0.ComboPooledDataSource">
+   
+   			<!--  Providing database specific information -->
+   			<property name="driverClass" value="oracle.jdbc.driver.OracleDriver"/>
+   			<property name="jdbcUrl" value="jdbc:oracle:thin:@localhost:1521:XE"/>
+   			<property name="user" value="scott"></property>
+   			<property name="password" value="tiger"></property>
+   			
+   			<!-- Providing Connection Pooling Information -->
+   			
+   			<property name="minPoolSize" value="1"/>
+   			<property name="maxPoolSize" value="20"/>
+  </bean>
+  <!-- Defining SessionFactory Bean -->
+  <bean id="sessionFactory" 
+  		class="org.springframework.orm.hibernate5.LocalSessionFactoryBean">
+  		<!-- Providing the above created DataSource to the SessionFactory -->
+  		<property name="dataSource" ref="myDataSource" ></property>
+  		<property name="packagesToScan" value="com.westernunion.entity"/>
+  
+  		<!--  Providing more database specific information for Oracle  -->
+  		<property name="hibernateProperties">
+  			<props>
+	  			<prop key="hibernate.dialect">org.hibernate.dialect.Oracle9Dialect</prop>
+	  			<prop key="hibernate.show_sql">true</prop>
+  			</props>
+  		</property>
+  </bean>
+  
+  <!--  Defining Hibernate Transaction Manager -->
+  <bean id="restTemplate" class="org.springframework.web.client.RestTemplate"/>
+  
+  <bean id="myTransactionManager"
+  		class="org.springframework.orm.hibernate5.HibernateTransactionManager">
+  	<property name="sessionFactory" ref="sessionFactory"></property>
+  
+  </bean>
+  
+  <!--  Adding the Annotation support for Transaction Management -->
+  
+  <tx:annotation-driven transaction-manager="myTransactionManager"/>
+   
+</beans>
+
+
+
+
+
+
